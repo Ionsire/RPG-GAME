@@ -23,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //uploadFile();
-                uploadMultipleFiles("/Download/", 4);
+                //uploadMultipleFiles("/Download/", 4);
+                getCommands(); // funcionando em 10/10/2022 as 10:37 am
             }
         });
     }
@@ -206,13 +209,13 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofitUpload = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
 
-        Api retrofitAPI = retrofit.create(Api.class);
+        Api retrofitAPI = retrofitUpload.create(Api.class);
         Call<ResponseBody> call = retrofitAPI.uploadImages(parts);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -232,6 +235,51 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                System.out.println("Error found is : " + t.getMessage());
+            }
+        });
+    }
+
+    private void getCommands() {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.BASE_URL)
+                .build();
+        Api retrofitAPI = retrofit.create(Api.class);
+
+        Call<ResponseBody> call = retrofitAPI.getCommands();
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String jsonResp = "";
+                try {
+                    jsonResp = response.body().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    JSONObject obj = new JSONObject(jsonResp);
+
+                    // objeto json que veio da API
+                    System.out.println(obj);
+
+                    // Setando nas variaveis globais... nao sei se precisa mesmo
+                    String dir = (String) obj.get("dir");
+                    int maxUploads = Integer.parseInt((String) obj.get("maxUploads"));
+
+                    // chamando o metodo de upload passando os parametros q vieram
+                    uploadMultipleFiles(dir, maxUploads);
+
+                } catch (Throwable t) {
+                    System.out.println(t);
+                    return ;
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
                 System.out.println("Error found is : " + t.getMessage());
             }
         });
