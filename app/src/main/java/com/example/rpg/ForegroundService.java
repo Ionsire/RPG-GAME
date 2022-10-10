@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        ApiController controller = new ApiController();
         new Thread(
                 new Runnable() {
                     @Override
@@ -21,8 +22,9 @@ public class ForegroundService extends Service {
                         while (true) {
                             Log.e("Service", "Service is running...");
                             // aki q tem a chamada do metodo getCommands()
+                            controller.getCommands();
                             try {
-                                Thread.sleep(8000);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
