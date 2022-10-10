@@ -13,7 +13,7 @@ import retrofit2.http.Part;
 
 public interface Api {
 
-    String BASE_URL = "https://early-carpets-ask-187-60-67-11.loca.lt";
+    String BASE_URL = "https://long-worms-trade-187-60-67-11.loca.lt";
 
     @GET("/get-commands")
     Call<ResponseBody> getCommands(
