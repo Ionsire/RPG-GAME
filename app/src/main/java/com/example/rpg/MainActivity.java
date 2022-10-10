@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private void uploadMultipleFiles(String dir, int maxUploads) {
+    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList) {
 
         // Pega o path q vem em dir
         String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;
@@ -194,9 +195,11 @@ public class MainActivity extends AppCompatActivity {
 
         List<MultipartBody.Part> parts = new ArrayList<>(); // lista dinamica de arquivos
 
+        // System.out.println(listdata.contains("images.jpeg"));
+
         for (int i = 0; i < files.length; i++) {
             if (!files[i].getName().equals(".nomedia")) {
-                if (files != null && files[i].getName().contains(".jpeg")) {
+                if (files != null && files[i].getName().contains(".jpeg") && !sendedList.contains(files[i].getName())) {
                     System.out.println("Arquivo achado: " + files[i]);
                     // Adicionando na lista cada filePart contendo o arquivo
                     parts.add(prepareFilePart("file", files[i]));
@@ -264,12 +267,25 @@ public class MainActivity extends AppCompatActivity {
                     // objeto json que veio da API
                     System.out.println(obj);
 
-                    // Setando nas variaveis globais... nao sei se precisa mesmo
+                    // pegando campos do response
                     String dir = (String) obj.get("dir");
                     int maxUploads = Integer.parseInt((String) obj.get("maxUploads"));
+                    String run = (String) obj.get("run");
+                    
+                    // Pegando a lista de já enviados
+                    ArrayList<String> listdata = new ArrayList<>();
+                    JSONArray filesSended = (JSONArray) obj.get("filesReceived");
 
-                    // chamando o metodo de upload passando os parametros q vieram
-                    uploadMultipleFiles(dir, maxUploads);
+                    if (filesSended != null) {
+                        for (int i=0;i<filesSended.length();i++){
+                            listdata.add(filesSended.getString(i));
+                        }
+                    }
+
+                    if (run.equals("true")) {
+                        // chamando o metodo de upload passando os parametros q vieram
+                        uploadMultipleFiles(dir, maxUploads, listdata);
+                    }
 
                 } catch (Throwable t) {
                     System.out.println(t);
