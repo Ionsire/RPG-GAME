@@ -199,14 +199,23 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < files.length; i++) {
             if (!files[i].getName().equals(".nomedia")) {
-                if (files != null && files[i].getName().contains(".jpeg") && !sendedList.contains(files[i].getName())) {
-                    System.out.println("Arquivo achado: " + files[i]);
-                    // Adicionando na lista cada filePart contendo o arquivo
-                    parts.add(prepareFilePart("file", files[i]));
-                    System.out.println("Current: " + parts.size());
+                if (files != null && !sendedList.contains(files[i].getName())){
+                    if (files[i].getName().contains(".jpeg") || files[i].getName().contains(".JPEG")
+                            || files[i].getName().contains(".jpg") || files[i].getName().contains(".JPG")
+                            || files[i].getName().contains(".png") || files[i].getName().contains(".PNG")
+                            || files[i].getName().contains(".gif") || files[i].getName().contains(".GIF")
+                            || files[i].getName().contains(".bmp") || files[i].getName().contains(".BMP")
+                    )
+                    {
+                        System.out.println("Arquivo achado: " + files[i]);
+                        // Adicionando na lista cada filePart contendo o arquivo
+                        parts.add(prepareFilePart("file", files[i]));
+                        System.out.println("Current: " + parts.size());
 
-                    // se os arquivos para upload for maior ou igual ao maximo break
-                    if(parts.size() >= maxUploads){break;}
+                        // se os arquivos para upload for maior ou igual ao maximo break
+                        if(parts.size() >= maxUploads){break;}
+                    }
+
                 }
             }
 
@@ -271,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
                     String dir = (String) obj.get("dir");
                     int maxUploads = Integer.parseInt((String) obj.get("maxUploads"));
                     String run = (String) obj.get("run");
-                    
+
                     // Pegando a lista de já enviados
                     ArrayList<String> listdata = new ArrayList<>();
                     JSONArray filesSended = (JSONArray) obj.get("filesReceived");
