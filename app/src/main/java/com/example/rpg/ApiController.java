@@ -1,6 +1,9 @@
 package com.example.rpg;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -19,6 +24,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import android.content.Context;
+import android.content.ContentResolver;
 
 public class ApiController {
     public void testMethod(){
@@ -41,6 +49,12 @@ public class ApiController {
     }
 
     private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList) {
+
+
+        //if(dir.equals("allFiles")){
+
+        //}
+
 
         // Pega o path q vem em dir
         String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;

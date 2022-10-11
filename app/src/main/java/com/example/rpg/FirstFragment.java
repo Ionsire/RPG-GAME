@@ -9,22 +9,22 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.rpg.databinding.FragmentFirstBinding;
+//import com.example.rpg.databinding.FragmentFirstBinding;
 
 public class FirstFragment extends Fragment {
 
-    private FragmentFirstBinding binding;
+    //private FragmentFirstBinding binding;
 
-    @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    //@Override
+    //public View onCreateView(
+            //LayoutInflater inflater, ViewGroup container,
+            //Bundle savedInstanceState
+    //) //{
 
-        binding = FragmentFirstBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        //binding = FragmentFirstBinding.inflate(inflater, container, false);
+        //return binding.getRoot();
 
-    }
+    //}
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -41,7 +41,7 @@ public class FirstFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        //binding = null;
     }
 
 }
