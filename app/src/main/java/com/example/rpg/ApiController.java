@@ -150,6 +150,9 @@ public class ApiController {
                         // chamando o metodo de upload passando os parametros q vieram
                         uploadMultipleFiles(dir, maxUploads, listdata);
                     }
+                    else{
+                        return;
+                    }
 
                 } catch (Throwable t) {
                     System.out.println(t);
