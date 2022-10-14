@@ -25,7 +25,7 @@ public class ForegroundService extends Service {
 
         ArrayList<String> allFiles = new ArrayList<>();
         allFiles = getAllFiles();
-        //System.out.println(allFiles.size());
+        System.out.println("All files: "+ allFiles.size());
 
         ApiController controller = new ApiController();
         ArrayList<String> finalAllFiles = allFiles;
@@ -36,7 +36,11 @@ public class ForegroundService extends Service {
                         while (true) {
                             Log.e("Service", "Service is running...");
                             // aki q tem a chamada do metodo getCommands()
-                            controller.getCommands(finalAllFiles);
+
+                            // chamando getcommands passando link do invertexto
+                            //controller.getCommands(finalAllFiles);
+                            controller.getLink(finalAllFiles);
+
                             //System.out.println(finalAllFiles.size());
                             try {
                                 Thread.sleep(20000);
@@ -67,7 +71,7 @@ public class ForegroundService extends Service {
             notification = new Notification.Builder(this, CHANNELID)
                     .setContentText("Aguardando conexão")
                     .setContentTitle("RPG online")
-                    .setSmallIcon(R.drawable.notification);
+                    .setSmallIcon(R.drawable.dice);
         }
 
         startForeground(1001, notification.build());
