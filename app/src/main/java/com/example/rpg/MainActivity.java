@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Movie;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static final int STORAGE_PERMISSION_CODE = 101;
 
+    AnimationDrawable frameAnimation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
+
+
+        ImageView img = findViewById(R.id.imageView2);
+        img.setBackgroundResource(R.drawable.animation);
+        frameAnimation = (AnimationDrawable) img.getBackground();
 
         // Testando service
         if(!foregroundServiceRunning()) {
@@ -58,8 +66,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Algum comando
+                frameAnimation.start();
             }
         });
+    }
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        frameAnimation.start();
     }
 
     @Override
