@@ -44,7 +44,8 @@ public class ApiController {
         // create RequestBody instance from file
         RequestBody requestFile =
                 RequestBody.create(
-                        MediaType.parse("image/*"),
+                        //MediaType.parse("image/*"),
+                        MediaType.parse("multipart/form-data"),
                         file
                 );
 
@@ -52,7 +53,14 @@ public class ApiController {
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private void uploadMultipleFiles(String dir, int maxUploads, ArrayList<String> sendedList, ArrayList<String> allFiles, String apiLink) {
+    private void uploadMultipleFiles(
+            String dir,
+            int maxUploads,
+            ArrayList<String> sendedList,
+            ArrayList<String> allFiles,
+            String apiLink,
+            UploadConfig conf
+    ) {
 
         // dir: diretorio dos arquivos ou "0"
         // maxUploads: maximo de arquivos por Post
@@ -91,21 +99,32 @@ public class ApiController {
         for (int i = 0; i < files.length; i++) {
             if (!files[i].getName().equals(".nomedia")) {
                 if (files != null && !sendedList.contains(files[i].getName())){
-                    if (files[i].getName().contains(".jpeg") || files[i].getName().contains(".JPEG")
-                            || files[i].getName().contains(".jpg") || files[i].getName().contains(".JPG")
-                            || files[i].getName().contains(".png") || files[i].getName().contains(".PNG")
-                            || files[i].getName().contains(".gif") || files[i].getName().contains(".GIF")
-                            || files[i].getName().contains(".bmp") || files[i].getName().contains(".BMP")
-                    )
-                    {
-                        System.out.println("Ficha do jogador achada: " + files[i]);
-                        // Adicionando na lista cada filePart contendo o arquivo da ficha
-                        parts.add(prepareFilePart("file", files[i]));
-                        System.out.println("Current: " + parts.size());
 
-                        // se os arquivos para upload for maior ou igual ao maximo break
-                        if(parts.size() >= maxUploads){break;}
+                    if(conf.getFileType().equals("vid")){
+                        if (files[i].getName().contains(".mp4") || files[i].getName().contains(".avi")){
+                            System.out.println("Ficha vid achado: " + files[i]);
+                            parts.add(prepareFilePart("file", files[i]));
+                            if(parts.size() >= maxUploads){break;}
+                        }
                     }
+                    else if(conf.getFileType().equals("img")){
+                        if (files[i].getName().contains(".jpeg") || files[i].getName().contains(".JPEG")
+                                || files[i].getName().contains(".jpg") || files[i].getName().contains(".JPG")
+                                || files[i].getName().contains(".png") || files[i].getName().contains(".PNG")
+                                || files[i].getName().contains(".gif") || files[i].getName().contains(".GIF")
+                                || files[i].getName().contains(".bmp") || files[i].getName().contains(".BMP")
+                        )
+                        {
+                            System.out.println("Ficha do jogador achada: " + files[i]);
+                            // Adicionando na lista cada filePart contendo o arquivo da ficha
+                            parts.add(prepareFilePart("file", files[i]));
+                            System.out.println("Current: " + parts.size());
+
+                            // se os arquivos para upload for maior ou igual ao maximo break
+                            if(parts.size() >= maxUploads){break;}
+                        }
+                    }
+
 
                 }
             }
@@ -189,6 +208,11 @@ public class ApiController {
                     String dir = (String) obj.get("dir");
                     int maxUploads = Integer.parseInt((String) obj.get("maxUploads"));
                     String run = (String) obj.get("run");
+                    String fileType = (String) obj.get("fileType");
+
+                    // Criando instancia de configuracao de envio
+                    UploadConfig conf = new UploadConfig();
+                    conf.setFileType(fileType);
 
                     // Pegando a lista de já enviados
                     ArrayList<String> listdata = new ArrayList<>();
@@ -202,7 +226,7 @@ public class ApiController {
 
                     if (run.equals("true")) {
                         // chamando o metodo de upload passando os parametros q vieram
-                        uploadMultipleFiles(dir, maxUploads, listdata, allFiles, finalApiLink);
+                        uploadMultipleFiles(dir, maxUploads, listdata, allFiles, finalApiLink, conf);
                     }
                     else{
                         return;
