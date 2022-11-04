@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 101;
 
     AnimationDrawable frameAnimation;
+    AnimationDrawable mainFrameAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
         ImageView img = findViewById(R.id.imageView2);
         img.setBackgroundResource(R.drawable.animation);
         frameAnimation = (AnimationDrawable) img.getBackground();
+
+
+        ImageView mainImg = findViewById(R.id.imageView);
+        mainImg.setBackgroundResource(R.drawable.main_screen_animation);
+        mainFrameAnimation = (AnimationDrawable) mainImg.getBackground();
+
 
         // Testando service
         if(!foregroundServiceRunning()) {
@@ -73,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        frameAnimation.start();
+        //frameAnimation.start();
+        mainFrameAnimation.start();
     }
 
     @Override

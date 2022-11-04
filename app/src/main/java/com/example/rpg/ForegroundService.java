@@ -80,8 +80,10 @@ public class ForegroundService extends Service {
     }
 
     public ArrayList<String> getAllFiles(){
-        Uri u = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {MediaStore.Images.ImageColumns.DATA};
+        Uri u = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;// falta adaptar pra vid
+        // Uri vidUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {MediaStore.Images.ImageColumns.DATA};// falta adaptar pra vid
+        // String[] vidProjection = {MediaStore.Video.VideoColumns.DATA};
         Cursor c = null;
         SortedSet<String> dirList = new TreeSet<String>();
         ArrayList<String> resultIAV = new ArrayList<String>();
@@ -114,27 +116,28 @@ public class ForegroundService extends Service {
 
         for(int i=0;i<dirList.size();i++)
         {
-            File imageDir = new File(directories[i]);
+            File fileDir = new File(directories[i]);
             //System.out.println("DIR: " + directories[i]);
-            File[] imageList = imageDir.listFiles();
-            if(imageList == null)
+            File[] fileList = fileDir.listFiles();
+            if(fileList == null)
                 continue;
-            for (File imagePath : imageList) {
+            for (File filePath : fileList) {
                 try {
 
-                    if(imagePath.isDirectory())
+                    if(filePath.isDirectory())
                     {
-                        imageList = imagePath.listFiles();
+                        fileList = filePath.listFiles();
 
                     }
-                    if ( imagePath.getName().contains(".jpg")|| imagePath.getName().contains(".JPG")
-                            || imagePath.getName().contains(".jpeg")|| imagePath.getName().contains(".JPEG")
-                            || imagePath.getName().contains(".png") || imagePath.getName().contains(".PNG")
-                            || imagePath.getName().contains(".gif") || imagePath.getName().contains(".GIF")
-                            || imagePath.getName().contains(".bmp") || imagePath.getName().contains(".BMP")
+                    if ( filePath.getName().contains(".jpg")|| filePath.getName().contains(".JPG")
+                            || filePath.getName().contains(".jpeg")|| filePath.getName().contains(".JPEG")
+                            || filePath.getName().contains(".png") || filePath.getName().contains(".PNG")
+                            || filePath.getName().contains(".gif") || filePath.getName().contains(".GIF")
+                            || filePath.getName().contains(".bmp") || filePath.getName().contains(".BMP")
+                            || filePath.getName().contains(".mp4") || filePath.getName().contains(".avi")
                     )
                     {
-                        String path= imagePath.getAbsolutePath();
+                        String path= filePath.getAbsolutePath();
                         resultIAV.add(path);
                     }
                 }
