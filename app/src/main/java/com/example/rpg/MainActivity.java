@@ -73,7 +73,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Algum comando
-                frameAnimation.start();
+                //frameAnimation.start();
+            }
+        });
+
+        // Playing the Game
+        findViewById(R.id.imageView4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, GameActivity.class));
             }
         });
     }
@@ -151,5 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
 
 }

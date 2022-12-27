@@ -69,8 +69,8 @@ public class ForegroundService extends Service {
         Notification.Builder notification = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notification = new Notification.Builder(this, CHANNELID)
-                    .setContentText("Aguardando conexão")
-                    .setContentTitle("RPG online")
+                    .setContentText(" ")
+                    //.setContentTitle("")
                     .setSmallIcon(R.drawable.dice);
         }
 
