@@ -36,14 +36,19 @@ public class Player {
 
     boolean running = false;
 
-    Player(Resources res){
-        width = (int) (width * screenRatioX);
-        height = (int) (height * screenRatioY);
+    Player(Resources res, int posX, int posY){
 
-        sprite1 = BitmapFactory.decodeResource(res, R.drawable.f1);
-        sprite2 = BitmapFactory.decodeResource(res, R.drawable.f2);
-        sprite3 = BitmapFactory.decodeResource(res, R.drawable.f1);
-        sprite4 = BitmapFactory.decodeResource(res, R.drawable.f3);
+        this.posX = posX;
+        this.posY = posY;
+
+        // Removendo o Blur na imagem carregada
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+
+        sprite1 = BitmapFactory.decodeResource(res, R.drawable.f1, options);
+        sprite2 = BitmapFactory.decodeResource(res, R.drawable.f2, options);
+        sprite3 = BitmapFactory.decodeResource(res, R.drawable.f1, options);
+        sprite4 = BitmapFactory.decodeResource(res, R.drawable.f3, options);
 
         width = sprite1.getWidth();
         height = sprite1.getHeight();
@@ -52,11 +57,11 @@ public class Player {
         //width /= 12;
         //height /= 12;
 
-        width *= 4;
-        height *= 4;
-
         width = (int) (width * screenRatioX);
         height = (int) (height * screenRatioY);
+
+        width *= 3;
+        height *= 3;
 
         sprite1 = Bitmap.createScaledBitmap(sprite1, width, height,false);
         sprite2 = Bitmap.createScaledBitmap(sprite2, width, height,false);

@@ -28,7 +28,7 @@ public class GameView extends SurfaceView implements Runnable{
 
     private int directionX = 0;
     private int directionY = 0;
-    private int velocity = 10; // quantia de pixels de movimento
+    private int velocity = 5; // quantia de pixels de movimento
     private int positionX = 50;
     private int positionY = 50;
 
@@ -70,7 +70,7 @@ public class GameView extends SurfaceView implements Runnable{
         screenRatioX = 1920f / screenX;
         screenRatioY = 1080f / screenY;
 
-        player = new Player(getResources());
+        player = new Player(getResources(), screenX / 2, screenY / 2);
 
         paint = new Paint();
         paint.setTextSize(128);
@@ -135,12 +135,6 @@ public class GameView extends SurfaceView implements Runnable{
                 //canvas.drawColor(Color.WHITE);
                 canvas.drawBitmap(background.background, background.x, background.y, paint);
 
-                // Drawn the Ui buttons with fixed positions
-                canvas.drawBitmap(button_R, 310,730, paint);
-                canvas.drawBitmap(button_L, 50,730, paint);
-                canvas.drawBitmap(button_D, 180,860, paint);
-                canvas.drawBitmap(button_U, 180,600, paint);
-
                 //positionX = positionX + (directionX * velocity);
                 //positionY = positionY + (directionY * velocity);
 
@@ -172,6 +166,12 @@ public class GameView extends SurfaceView implements Runnable{
                     //player.animFrameCount = 0;
                     contador = 0;
                 }
+
+                // Drawn the Ui buttons with fixed positions
+                canvas.drawBitmap(button_R, 310,730, paint);
+                canvas.drawBitmap(button_L, 50,730, paint);
+                canvas.drawBitmap(button_D, 180,860, paint);
+                canvas.drawBitmap(button_U, 180,600, paint);
 
                 getHolder().unlockCanvasAndPost(canvas);
             }
