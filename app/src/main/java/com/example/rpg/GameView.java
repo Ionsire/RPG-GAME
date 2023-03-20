@@ -46,6 +46,9 @@ public class GameView extends SurfaceView implements Runnable{
 
     int contador = 0;
 
+    int centerX;
+    int centerY;
+
     public GameView(GameActivity activity, int screenX, int screenY) {
         super(activity);
 
@@ -71,12 +74,15 @@ public class GameView extends SurfaceView implements Runnable{
         screenRatioY = 1080f / screenY;
 
         player = new Player(getResources(), screenX / 2, screenY / 2);
+        centerX = player.posX;
+        centerY = player.posY;
 
         paint = new Paint();
         paint.setTextSize(128);
         paint.setColor(Color.WHITE);
 
-        background = new Background(screenX, screenY, getResources());
+        //background = new Background(screenX, screenY, getResources());
+        background = new Background(0, 0, getResources());
 
     }
 
@@ -133,16 +139,25 @@ public class GameView extends SurfaceView implements Runnable{
             if(canvas != null){
                 // pintando o fundo de branco
                 //canvas.drawColor(Color.WHITE);
-                canvas.drawBitmap(background.background, background.x, background.y, paint);
+                //canvas.drawBitmap(background.background, background.x, background.y, paint);
 
                 //positionX = positionX + (directionX * velocity);
                 //positionY = positionY + (directionY * velocity);
 
-                // Calc the player sprite position
-                player.posX = player.posX + (directionX * player.velocity);
-                player.posY = player.posY + (directionY * player.velocity);
+                System.out.println("BACK X: " + background.x);
+                System.out.println("BACK Y: " + background.y);
 
                 if (playWalk){
+
+                    // if X = -145 ou X = -25 player q anda em x
+
+                    // Calc the player sprite position
+                    //player.posX = player.posX + (directionX * player.velocity);
+                    //player.posY = player.posY + (directionY * player.velocity);
+
+                    background.x = background.x + (directionX * player.velocity) * (-1);// + (directionX * player.velocity);
+                    background.y = background.y + (directionY * player.velocity) * (-1);// + (directionY * player.velocity);
+
                     // Drawning the player on screen frame 1
 
                     // 20 iteracoes é o ciclo completo para passar todos os frames
@@ -155,13 +170,18 @@ public class GameView extends SurfaceView implements Runnable{
                     //}
 
                     //canvas.drawBitmap(player.walkAnimation(player.animFrameCount), player.posX, player.posY, null);
-                    canvas.drawBitmap(player.walkAnimation(contador), player.posX, player.posY, paint);
+                    canvas.drawBitmap(background.background, background.x, background.y, paint);
+                    //canvas.drawBitmap(player.walkAnimation(contador), player.posX, player.posY, paint);
+                    canvas.drawBitmap(player.walkAnimation(contador), centerX, centerY, paint);
                     contador ++; // acho q posso botar o contador em player e ir so adicionando aki fora
                     //player.animFrameCount ++;
 
                 }
                 else{
-                    canvas.drawBitmap(player.sprite1, player.posX, player.posY, paint);
+                    //canvas.drawBitmap(player.sprite1, player.posX, player.posY, paint);
+                    canvas.drawBitmap(background.background, background.x, background.y, paint);
+                    canvas.drawBitmap(player.sprite1, centerX, centerY, paint);
+
                     //tics = 0;
                     //player.animFrameCount = 0;
                     contador = 0;

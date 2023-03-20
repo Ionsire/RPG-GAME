@@ -17,7 +17,7 @@ public class Background {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
 
-        background = BitmapFactory.decodeResource(res, R.drawable.main_bg_1, options);
+        background = BitmapFactory.decodeResource(res, R.drawable.map1, options);
 
         width = background.getWidth();
         height = background.getHeight();

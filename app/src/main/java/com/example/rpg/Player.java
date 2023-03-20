@@ -16,7 +16,7 @@ public class Player {
     int animFrameCount = 0;
 
     // Posicao 2D inicial na tela
-    int velocity = 10;
+    int velocity = 5;
     int posX = 0;
     int posY = 0;
 
