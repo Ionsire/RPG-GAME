@@ -1,6 +1,7 @@
 package com.example.rpg;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -48,6 +49,7 @@ public class GameView extends SurfaceView implements Runnable{
 
     int centerX;
     int centerY;
+    Bitmap player2;
 
     public GameView(GameActivity activity, int screenX, int screenY) {
         super(activity);
@@ -82,8 +84,19 @@ public class GameView extends SurfaceView implements Runnable{
         paint.setColor(Color.WHITE);
 
         //background = new Background(screenX, screenY, getResources());
-        background = new Background(0, 0, getResources());
+        background = new Background(screenX / 2, screenY / 2, getResources());
 
+        // Removendo o Blur na imagem carregada
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+
+        // player 2
+        player2 = BitmapFactory.decodeResource(getResources(), R.drawable.char2, options);
+        int p2Width = player2.getWidth();
+        int p2Height = player2.getHeight();
+        p2Width *= 2;
+        p2Height *= 2;
+        player2 = Bitmap.createScaledBitmap(player2, p2Width, p2Height, false);
     }
 
     @Override
@@ -128,6 +141,9 @@ public class GameView extends SurfaceView implements Runnable{
         if (player.x >= screenX - player.width)
             player.x = screenX - player.width;*/
 
+        // colisao check WIP
+
+
     }
     private void draw () {
 
@@ -137,15 +153,15 @@ public class GameView extends SurfaceView implements Runnable{
 
             // Testando se canva é null para evitar um erro quando a tela é minimizada
             if(canvas != null){
-                // pintando o fundo de branco
-                //canvas.drawColor(Color.WHITE);
+                // pintando o fundo de preto é importante
+                canvas.drawColor(Color.BLACK);
                 //canvas.drawBitmap(background.background, background.x, background.y, paint);
 
                 //positionX = positionX + (directionX * velocity);
                 //positionY = positionY + (directionY * velocity);
 
-                System.out.println("BACK X: " + background.x);
-                System.out.println("BACK Y: " + background.y);
+                //System.out.println("BACK X: " + background.x);
+                //System.out.println("BACK Y: " + background.y);
 
                 if (playWalk){
 
@@ -155,8 +171,9 @@ public class GameView extends SurfaceView implements Runnable{
                     //player.posX = player.posX + (directionX * player.velocity);
                     //player.posY = player.posY + (directionY * player.velocity);
 
-                    background.x = background.x + (directionX * player.velocity) * (-1);// + (directionX * player.velocity);
-                    background.y = background.y + (directionY * player.velocity) * (-1);// + (directionY * player.velocity);
+                    // movendo o background com base na velocidade do player
+                    background.x = background.x - (directionX * player.velocity);
+                    background.y = background.y - (directionY * player.velocity);
 
                     // Drawning the player on screen frame 1
 
@@ -187,6 +204,9 @@ public class GameView extends SurfaceView implements Runnable{
                     contador = 0;
                 }
 
+                // Drawn player 2
+                canvas.drawBitmap(player2, 1000,800, paint);
+
                 // Drawn the Ui buttons with fixed positions
                 canvas.drawBitmap(button_R, 310,730, paint);
                 canvas.drawBitmap(button_L, 50,730, paint);
@@ -214,40 +234,29 @@ public class GameView extends SurfaceView implements Runnable{
                 // Test for button Right
                 if ( xTouch >= 310 && xTouch < (310 + button_R.getWidth())
                         && yTouch >= 730 && yTouch < (730 + button_R.getHeight())){
-                    //System.out.println("TOCOU EM R");
-                    directionX = 1;
+                    //directionX = 1;
                     playWalk = true;
 
                 }
                 // Test for button Left
                 if ( xTouch >= 50 && xTouch < (50 + button_R.getWidth())
                         && yTouch >= 730 && yTouch < (730 + button_R.getHeight())){
-                    //System.out.println("TOCOU EM L");
-                    directionX = -1;
+                    //directionX = -1;
                     playWalk = true;
                 }
                 // Test for button Down
                 if ( xTouch >= 180 && xTouch < (180 + button_R.getWidth())
                         && yTouch >= 860 && yTouch < (860 + button_R.getHeight())){
-                    //System.out.println("TOCOU EM D");
-                    directionY = 1;
+                    //directionY = 1;
                     playWalk = true;
                 }
                 // Test for button Up
                 if ( xTouch >= 180 && xTouch < (180 + button_R.getWidth())
                         && yTouch >= 600 && yTouch < (600 + button_R.getHeight())){
-                    //System.out.println("TOCOU EM U");
-                    directionY = -1;
+                    //directionY = -1;
                     playWalk = true;
                 }
 
-
-                //if (event.getX() < screenX / 2) {
-                //player.isMoveX = true;
-                //}
-                //else if (event.getX() > screenX / 2){
-                //player.isMoveY = true;
-                //}
                 break;
 
             // Se tirar o dedo da tela

@@ -16,7 +16,7 @@ public class Player {
     int animFrameCount = 0;
 
     // Posicao 2D inicial na tela
-    int velocity = 5;
+    int velocity = 8;
     int posX = 0;
     int posY = 0;
 
@@ -60,8 +60,13 @@ public class Player {
         width = (int) (width * screenRatioX);
         height = (int) (height * screenRatioY);
 
-        width *= 3;
-        height *= 3;
+        width *= 5;
+        height *= 5;
+
+        // para ficar no centro da tela
+        // a posicao atual do obj tem q diminuir com metade da dimensao da imagem
+        this.posX -= (width/2);
+        this.posY -= (height/2);
 
         sprite1 = Bitmap.createScaledBitmap(sprite1, width, height,false);
         sprite2 = Bitmap.createScaledBitmap(sprite2, width, height,false);
