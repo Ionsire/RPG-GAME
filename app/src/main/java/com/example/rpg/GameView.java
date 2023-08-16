@@ -5,8 +5,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.animation.Animation;
@@ -60,8 +62,13 @@ public class GameView extends SurfaceView implements Runnable{
         tics = 0;
         //button = BitmapFactory.decodeResource(getResources(), R.drawable.player);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+
         // Ui for move
-        ui = new Ui(getResources());
+        ui = new Ui(getResources(), screenWidth, screenHeight);
 
         button_R = ui.getButton_R();
         button_L = ui.getButton_L();
@@ -147,12 +154,21 @@ public class GameView extends SurfaceView implements Runnable{
     }
     private void draw () {
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+
         // Responsavel por desenhar na tela
         if (getHolder().getSurface().isValid()) {
             Canvas canvas = getHolder().lockCanvas();
 
             // Testando se canva é null para evitar um erro quando a tela é minimizada
             if(canvas != null){
+
+                int canvasWidth = canvas.getWidth();
+                int canvasHeight = canvas.getHeight();
+                System.out.println("_______________" + canvasWidth + "/" + canvasHeight + "________________");
                 // pintando o fundo de preto é importante
                 canvas.drawColor(Color.BLACK);
                 //canvas.drawBitmap(background.background, background.x, background.y, paint);
@@ -208,10 +224,23 @@ public class GameView extends SurfaceView implements Runnable{
                 canvas.drawBitmap(player2, 1000,800, paint);
 
                 // Drawn the Ui buttons with fixed positions
-                canvas.drawBitmap(button_R, 310,730, paint);
-                canvas.drawBitmap(button_L, 50,730, paint);
-                canvas.drawBitmap(button_D, 180,860, paint);
-                canvas.drawBitmap(button_U, 180,600, paint);
+//                canvas.drawBitmap(button_R, 310,730, paint);
+//                canvas.drawBitmap(button_L, 50,730, paint);
+//                canvas.drawBitmap(button_D, 180,860, paint);
+//                canvas.drawBitmap(button_U, 180,600, paint);
+
+
+                int desiredImageWidth = (int) (screenWidth * 0.1f); // 50% da largura da tela
+                int desiredImageHeight = (int) (screenHeight * 0.1f); // 30% da altura da tela
+                System.out.println(desiredImageWidth+"/"+desiredImageHeight);
+
+                Rect srcRect = new Rect(0, 0, 120, 120); // Região da imagem a ser desenhada (toda a imagem)
+                Rect dstRect = new Rect(0, 0, desiredImageWidth, desiredImageHeight); // Região de destino (coordenadas e dimensões desejadas)
+
+                canvas.drawBitmap(button_R, srcRect,dstRect, paint);
+//                canvas.drawBitmap(button_L, 50,730, paint);
+//                canvas.drawBitmap(button_D, 180,860, paint);
+//                canvas.drawBitmap(button_U, ui.getSrcRect(),ui.getdstRect(), paint);
 
                 getHolder().unlockCanvasAndPost(canvas);
             }
